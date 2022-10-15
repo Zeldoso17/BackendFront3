@@ -31,3 +31,17 @@ class getPlaces(APIView):
             return Response(data, status=status.HTTP_200_OK)
         except:
             return Response({'message': "No se encontró ningun lugar cerca de ti"}, status=status.HTTP_404_NOT_FOUND)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class getPlaceInfo(APIView):
+
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, pk):
+        try:
+            urlApiBusqueda = f'http://www.inegi.org.mx/app/api/denue/v1/consulta/Ficha/{pk}/{TOKEN}'
+            locales = requests.get(urlApiBusqueda)
+            return Response(locales.json(), status=status.HTTP_200_OK)
+        except:
+            return Response("No se encontro informacion para ese lugar", status=status.HTTP_400_BAD_REQUEST)
